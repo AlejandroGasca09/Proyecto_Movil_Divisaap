@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:wallet_divisas/pantallas/transfe.dart';
+import 'package:wallet_divisas/pantallas/movimientos.dart';
+import 'login.dart';
 
 class Inicio extends StatefulWidget {
   const Inicio({super.key, required this.title});
@@ -11,51 +14,8 @@ class Inicio extends StatefulWidget {
 }
 
 class _InicioState extends State<Inicio> {
-  final TextEditingController _cantidadRetiroController = TextEditingController();
-  final TextEditingController _cantidadDepositoController = TextEditingController();
-  double? cantidadRetirada;
-  double? cantidadDepositada;
-
+  //obtiene el uid del usuario
   final String uid = FirebaseAuth.instance.currentUser!.uid;
-
-  @override
-  void dispose() {
-    _cantidadRetiroController.dispose();
-    _cantidadDepositoController.dispose();
-    super.dispose();
-  }
-
-  Future<void> retirarSaldo(double saldoActual) async {
-    final cantidad = double.tryParse(_cantidadRetiroController.text);
-    if (cantidad != null && cantidad <= saldoActual) {
-      final nuevoSaldo = saldoActual - cantidad;
-      await FirebaseFirestore.instance.collection('usuarios').doc(uid).update({
-        'saldo': nuevoSaldo,
-      });
-      setState(() {
-        cantidadRetirada = cantidad;
-        _cantidadRetiroController.clear();
-      });
-    } else {
-      setState(() {
-        cantidadRetirada = null;
-      });
-    }
-  }
-
-  Future<void> depositarSaldo(double saldoActual) async {
-    final cantidad = double.tryParse(_cantidadDepositoController.text);
-    if (cantidad != null) {
-      final nuevoSaldo = saldoActual + cantidad;
-      await FirebaseFirestore.instance.collection('usuarios').doc(uid).update({
-        'saldo': nuevoSaldo,
-      });
-      setState(() {
-        cantidadDepositada = cantidad;
-        _cantidadDepositoController.clear();
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +23,20 @@ class _InicioState extends State<Inicio> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar sesión',
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const Login(title: "Iniciar Sesión")),
+              );
+            },
+          ),
+        ],
       ),
+      //los datos del usuario deacuerdo al firebase
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance.collection('usuarios').doc(uid).snapshots(),
         builder: (context, snapshot) {
@@ -73,12 +46,13 @@ class _InicioState extends State<Inicio> {
           final data = snapshot.data!.data() as Map<String, dynamic>;
           final saldo = data['saldo']?.toDouble() ?? 0.0;
           final nombre = data['nombre'] ?? 'Usuario';
+          final tipo = data['tipo'];
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // nombre del usuario logeado
+                // nombre del usuario que accedio
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -88,7 +62,7 @@ class _InicioState extends State<Inicio> {
                 ),
                 const SizedBox(height: 16),
 
-                // Saldo que tiene el usuario
+                // Saldo que tienes cada uuario
                 Card(
                   color: Colors.blue.shade50,
                   elevation: 4,
@@ -103,7 +77,7 @@ class _InicioState extends State<Inicio> {
                           style: TextStyle(fontSize: 18),
                         ),
                         Text(
-                          '\$${saldo.toStringAsFixed(2)}',
+                          '\$${saldo.toString()} $tipo',
                           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -111,6 +85,45 @@ class _InicioState extends State<Inicio> {
                   ),
                 ),
                 const SizedBox(height: 30),
+                // los botones para la transferencia y el historial de los movimientos
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const Transferencia()),
+                        );
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.compare_arrows),
+                          SizedBox(width: 8),
+                          Text('Transferencia'),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const Movimientos()),
+                        );
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.history),
+                          SizedBox(width: 8),
+                          Text('Historial'),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+
               ],
             ),
           );

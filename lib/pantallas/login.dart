@@ -11,16 +11,20 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  //los controladores del correo y la contrasena y la autenticacion con firebase
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _auth = FirebaseAuth.instance;
 
+  //pa iniciar la sesion con la auntenticacion de firebase
   void _login() async {
     try {
       await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      //si pasa la autencticacion entra a al navegador de las pantallas
+      //y si no la pasa muetra el mensaje de error
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Navegador()),
@@ -55,6 +59,7 @@ class _LoginState extends State<Login> {
               onPressed: _login,
               child: const Text('Iniciar sesión'),
             ),
+            //boton para registrarte
             TextButton(
               onPressed: () {
                 Navigator.push(
@@ -62,7 +67,7 @@ class _LoginState extends State<Login> {
                   MaterialPageRoute(builder: (context) => const Registro(title: '',)),
                 );
               },
-              child: const Text('¿No tienes cuenta? Regístrate aquí'),
+              child: const Text('¿No tienes cuenta?, Regístrate aquí'),
             ),
           ],
         ),

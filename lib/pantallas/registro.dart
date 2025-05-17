@@ -21,7 +21,7 @@ class _RegistroState extends State<Registro> {
       final email = _emailController.text.trim();
       final password = _passwordController.text.trim();
 
-      // Verificamos que el nombre no esté vacío
+      //Verifica que el nombre no esté vacío
       if (nombre.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Por favor ingrese su nombre')),
@@ -29,26 +29,27 @@ class _RegistroState extends State<Registro> {
         return;
       }
 
-      // Crear usuario con Firebase Auth
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      //Crea usuario con Firebase Auth
+      UserCredential Credenciales = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      final uid = userCredential.user!.uid;
+      final uid = Credenciales.user!.uid;
 
-      // Guardar datos en Firestore
+      //Guardar datos en Firestore
       await FirebaseFirestore.instance.collection('usuarios').doc(uid).set({
         'nombre': nombre,
         'email': email,
         'saldo': 0.0,
+        'tipo': 'MXM'
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Registro exitoso')),
       );
 
-      Navigator.pop(context); // Volver a la pantalla anterior
+      Navigator.pop(context); //Vuelve a la pantalla anterior
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'Error al registrar')),

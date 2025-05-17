@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:wallet_divisas/pantallas/registro.dart';
 import 'package:wallet_divisas/pantallas/banquito.dart';
 import 'package:wallet_divisas/pantallas/divisa.dart';
 import 'package:wallet_divisas/pantallas/inicioDiv.dart';
-import 'package:wallet_divisas/pantallas/ubicacion.dart';
 
 class Navegador extends StatefulWidget{
   const Navegador({super.key});
@@ -22,15 +20,12 @@ class _NavegadorState extends State<Navegador>{
       _cuerpo = _pantallas[_p];
     });
   }
-
-
   @override
   void initState(){
     super.initState();
     _pantallas.add(const Inicio(title: "wallet-dio"));
-    _pantallas.add(const Banco(title: "Calcula"));
-    _pantallas.add(const Divisa(title: "Persistencia de datos"));
-    //_pantallas.add(const Ubicacion(title: "Hola a todos!!!!"));
+    _pantallas.add(const Banco(title: "Gestor Banco"));
+    _pantallas.add(const Divisa(title: "Divisa"));
     _cuerpo = _pantallas[_p];
   }
   @override
@@ -43,9 +38,8 @@ class _NavegadorState extends State<Navegador>{
         onTap: (value) => _cambiaPantalla(value),
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(label: "Inicio", icon: Icon(Icons.home)),
-          BottomNavigationBarItem(label: "Divisa", icon: Icon(Icons.home)),
-          BottomNavigationBarItem(label: "Banco", icon: Icon(Icons.handshake_outlined)),
-          BottomNavigationBarItem(label: "Principal", icon: Icon(Icons.accessibility_sharp)),
+          BottomNavigationBarItem(label: "Banco", icon: Icon(Icons.account_balance)),
+          BottomNavigationBarItem(label: "Divisas", icon: Icon(Icons.currency_exchange)),
         ],
       )
     );
